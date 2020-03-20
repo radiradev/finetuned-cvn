@@ -20,7 +20,7 @@ from opts import get_args
 
 # manually specify the GPUs to use
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]="5"
+os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
 args = get_args()
 
