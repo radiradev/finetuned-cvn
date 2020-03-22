@@ -9,7 +9,7 @@ References:
 '''
 __version__ = '1.0'
 __author__ = 'Saul Alonso-Monsalve, Leigh Howard Whitehead'
-__email__ = "saul.alonso.monsalve@cern.ch, leigh.howard.whitehead@cern.ch"
+__email__ = 'saul.alonso.monsalve@cern.ch, leigh.howard.whitehead@cern.ch'
 
 
 from tensorflow.keras.models import Model
@@ -38,30 +38,30 @@ def SEResNet(initial_conv_filters=64,
              output_names=['is_antineutrino','flavour','interaction',\
                            'protons','pions','pizeros','neutrons'],
              output_neurons=[1,4,4,4,4,4,4]):
-    """ Instantiate the Squeeze and Excite ResNet architecture.
-        # Arguments
-            initial_conv_filters: number of features for the initial convolution.
-            depth: number or layers in the each block, defined as a list.
-            filter: number of filters per block, defined as a list.
-            width: width multiplier for the network (for Wide ResNets).
-            weight_decay: weight decay (l2 norm).
-            weights: path of HDF5 file with model weights.
-            input_names: name of each input, defined as a list.
-            input_shapes: shape of each input, defined as a list.
-            output_names: name of each output, defined as a list.
-            output_neurons: number of neurons of each output, defined as a list.
-        # Returns
-            A tf.keras model instance.
-        """
+    ''' Instantiate the Squeeze and Excite ResNet architecture.
+    
+    Args:
+        initial_conv_filters: number of features for the initial convolution.
+        depth: number or layers in the each block, defined as a list.
+        filter: number of filters per block, defined as a list.
+        width: width multiplier for the network (for Wide ResNets).
+        weight_decay: weight decay (l2 norm).
+        weights: path of HDF5 file with model weights.
+        input_names: name of each input, defined as a list.
+        input_shapes: shape of each input, defined as a list.
+        output_names: name of each output, defined as a list.
+        output_neurons: number of neurons of each output, defined as a list.
 
-    assert len(depth) == len(filters), "The length of filter increment list must match the length " \
-                                       "of the depth list."
+    Returns: a tf.keras model instance.
+    '''
+    assert len(depth) == len(filters), 'The length of filter increment list must match the length ' \
+                                       'of the depth list.'
 
-    assert len(input_names) == len(input_shapes), "The length of input_names must match the length " \
-                                                  "of input_shapes."
+    assert len(input_names) == len(input_shapes), 'The length of input_names must match the length ' \
+                                                  'of input_shapes.'
 
-    assert len(output_names) == len(output_neurons), "The length of output_names must match the length " \
-                                                     "of output_neurons."
+    assert len(output_names) == len(output_neurons), 'The length of output_names must match the length ' \
+                                                     'of output_neurons.'
 
     # Inputs
     inputs = [None]*len(input_names)
@@ -100,7 +100,7 @@ def _resnet_block(input, filters, k=1, strides=(1, 1)):
     Returns: a tf tensor.
     '''
     init = input
-    channel_axis = 1 if K.image_data_format() == "channels_first" else -1
+    channel_axis = 1 if K.image_data_format() == 'channels_first' else -1
 
     x = BatchNormalization(axis=channel_axis)(input)
     x = Activation('relu')(x)
@@ -126,6 +126,7 @@ def _resnet_block(input, filters, k=1, strides=(1, 1)):
 
 def squeeze_excite_block(input, ratio=16):
     ''' Create a squeeze-excite block.
+
     Args:
         input: input tensor.
         k: width factor.
@@ -133,7 +134,7 @@ def squeeze_excite_block(input, ratio=16):
     Returns: a tf tensor.
     '''
     init = input
-    channel_axis = 1 if K.image_data_format() == "channels_first" else -1
+    channel_axis = 1 if K.image_data_format() == 'channels_first' else -1
     filters = init.shape[channel_axis]
     se_shape = (1, 1, filters)
 
@@ -152,15 +153,16 @@ def squeeze_excite_block(input, ratio=16):
 def _create_se_resnet(img_input, initial_conv_filters, filters,
                       depth, width,  weight_decay):
     '''Creates the SE-ResNet architecture with specified parameters.
+
     Args:
         initial_conv_filters: number of features for the initial convolution.
         filters: number of filters per block, defined as a list.
         depth: number or layers in the each block, defined as a list.
         width: width multiplier for network (for Wide ResNet).
         weight_decay: weight_decay (l2 norm).
+
     Returns: a tf.keras Model.
     '''
-
     channel_axis = 1 if K.image_data_format() == 'channels_first' else -1
     N = list(depth)
 

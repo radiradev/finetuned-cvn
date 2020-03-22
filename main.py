@@ -25,10 +25,7 @@ os.environ["CUDA_VISIBLE_DEVICES"]="0"
 args = get_args()
 
 def test():
-    '''
-    ****************************************
-    *************** DATASET ****************
-    ****************************************
+    ''' Test the DUNE CVN on input dataset.
     '''
     # parameters
     test_values = []
@@ -43,24 +40,11 @@ def test():
     with open('dataset/partition.p', 'rb') as partition_file:
         IDs, labels = pk.load(partition_file)
 
-
     # Print some dataset statistics
     print('Number of test examples: %d', len(IDs))
 
-
-    '''
-    ****************************************
-    ************** GENERATOR ***************
-    ****************************************
-    '''
     prediction_generator = DataGenerator(**TEST_PARAMS).generate(labels, IDs)
 
-
-    '''
-    ****************************************
-    ************** LOAD MODEL **************
-    ****************************************
-    '''
     # Load model
     print('Loading model from disk...')
     with open('saved_model/model.json', 'r') as json_file:
@@ -70,21 +54,18 @@ def test():
     if(args.print_model):
         model.summary()
 
-    '''
-    ****************************************
-    ***************** TEST *****************
-    ****************************************
-    '''
     print('Performing test...')
-    is_antineutrino_target_names = ['neutrino', 'antineutrino']
-    flavour_target_names = ['CC Numu', 'CC Nue', 'CC Nutau', 'NC']
-    interaction_target_names = ['CC QE', 'CC Res', 'CC DIS', 'CC Other']
-    categories_target_names = ['category 0', 'category 1', 'category 2', 'category 3', 'category 4', 'category 5', 'category 6', 
-                               'category 7', 'category 8', 'category 9', 'category 10', 'category 11', 'category 13']
-    protons_target_names = ['0', '1', '2', '>2']
-    pions_target_names = ['0', '1', '2', '>2']
-    pizeros_target_names = ['0', '1', '2', '>2']
-    neutrons_target_names = ['0', '1', '2', '>2']
+    is_antinu_labels = ['nu', 'antinu']
+    flav_labels = ['CC Numu', 'CC Nue', 'CC Nutau', 'NC']
+    inte_labels = ['CC QE', 'CC Res', 'CC DIS', 'CC other']
+    cate_labels = ['CC QE Numu', 'CC Res Numu', 'CC DIS Numu', 'CC other Numu',\
+                   'CC QE Nue', 'CC Res Nue', 'CC DIS Nue', 'CC other Nue',\
+                   'CC QE Nutau', 'CC Res Nutau', 'CC DIS Nutau', 'CC other Nutau',\
+                   'NC']
+    prot_labels = ['0 protons', '1 protons', '2 protons', '>2 protons']
+    chpi_labels = ['0 ch. pions', '1 ch. pions', '2 ch. pions', '>2 ch. pions']
+    nepi_labels = ['0 neu. pions', '1 neu. pions', '2 neu. pions', '>2 neu. pions']
+    neut_labels = ['0 neutrons', '1 neutrons', '2 neutrons', '>2 neutrons']
 
     # Predict results
     Y_pred = model.predict(x = prediction_generator,
@@ -93,108 +74,108 @@ def test():
 
     test_values = np.array(test_values[0:Y_pred[0].shape[0]]) # array with y true values
 
-    y_pred_is_antineutrino = np.around(Y_pred[0]).reshape((Y_pred[0].shape[0], 1)).astype(int) # 1-DIM array of predicted values (is_antineutrino)
-    y_pred_flavour = np.argmax(Y_pred[1], axis=1).reshape((Y_pred[1].shape[0], 1))             # 1-DIM array of predicted values (flavour)
-    y_pred_interaction = np.argmax(Y_pred[2], axis=1).reshape((Y_pred[2].shape[0], 1))         # 1-DIM array of predicted values (interaction)
-    y_pred_categories = np.zeros(y_pred_flavour.shape, dtype=int)                              # 1-DIM array of predicted values (categories)
-    y_pred_protons = np.argmax(Y_pred[3], axis=1).reshape((Y_pred[3].shape[0], 1))             # 1-DIM array of predicted values (protons)
-    y_pred_pions = np.argmax(Y_pred[4], axis=1).reshape((Y_pred[4].shape[0], 1))               # 1-DIM array of predicted values (pions)
-    y_pred_pizeros = np.argmax(Y_pred[5], axis=1).reshape((Y_pred[5].shape[0], 1))             # 1-DIM array of predicted values (pizeros)
-    y_pred_neutrons = np.argmax(Y_pred[6], axis=1).reshape((Y_pred[6].shape[0], 1))            # 1-DIM array of predicted values (neutrons)
+    y_pred_is_antinu = np.around(Y_pred[0]).reshape((Y_pred[0].shape[0], 1)).astype(int) # 1-dim arr. of pred. values (is_antinu)
+    y_pred_flav = np.argmax(Y_pred[1], axis=1).reshape((Y_pred[1].shape[0], 1))          # 1-dim arr. of pred. values (flavour)
+    y_pred_inte = np.argmax(Y_pred[2], axis=1).reshape((Y_pred[2].shape[0], 1))          # 1-dim arr. of pred. values (interaction)
+    y_pred_cate = np.zeros(y_pred_flav.shape, dtype=int)                                 # 1-dim arr. of pred. values (categories)
+    y_pred_prot = np.argmax(Y_pred[3], axis=1).reshape((Y_pred[3].shape[0], 1))          # 1-dim arr. of pred. values (protons)
+    y_pred_chpi = np.argmax(Y_pred[4], axis=1).reshape((Y_pred[4].shape[0], 1))          # 1-dim arr. of pred. values (charged pions)
+    y_pred_nepi = np.argmax(Y_pred[5], axis=1).reshape((Y_pred[5].shape[0], 1))          # 1-dim arr. of pred. values (neutral pions)
+    y_pred_neut = np.argmax(Y_pred[6], axis=1).reshape((Y_pred[6].shape[0], 1))          # 1-dim arr. of pred. values (neutrons)
 
-    y_test_is_antineutrino = np.array([aux['y_value'][0] for aux in test_values]).reshape(y_pred_is_antineutrino.shape)
-    y_test_flavour = np.array([aux['y_value'][1] for aux in test_values]).reshape(y_pred_flavour.shape)
-    y_test_interaction = np.array([aux['y_value'][2] for aux in test_values]).reshape(y_pred_interaction.shape)
-    y_test_categories = np.zeros(y_test_flavour.shape, dtype=int)
-    y_test_protons = np.array([aux['y_value'][3] for aux in test_values]).reshape(y_pred_protons.shape)
-    y_test_pions = np.array([aux['y_value'][4] for aux in test_values]).reshape(y_pred_pions.shape)
-    y_test_pizeros = np.array([aux['y_value'][5] for aux in test_values]).reshape(y_pred_pizeros.shape)
-    y_test_neutrons = np.array([aux['y_value'][6] for aux in test_values]).reshape(y_pred_neutrons.shape)
+    y_test_is_antinu = np.array([aux['y_value'][0] for aux in test_values]).reshape(y_pred_is_antinu.shape)
+    y_test_flav = np.array([aux['y_value'][1] for aux in test_values]).reshape(y_pred_flav.shape)
+    y_test_inte = np.array([aux['y_value'][2] for aux in test_values]).reshape(y_pred_inte.shape)
+    y_test_cate = np.zeros(y_test_flav.shape, dtype=int)
+    y_test_prot = np.array([aux['y_value'][3] for aux in test_values]).reshape(y_pred_prot.shape)
+    y_test_chpi = np.array([aux['y_value'][4] for aux in test_values]).reshape(y_pred_chpi.shape)
+    y_test_nepi = np.array([aux['y_value'][5] for aux in test_values]).reshape(y_pred_nepi.shape)
+    y_test_neut = np.array([aux['y_value'][6] for aux in test_values]).reshape(y_pred_neut.shape)
 
-    # manually set y_pred_categories and y_test_categories
-    for i in range(y_pred_categories.shape[0]):
+    # manually set y_pred_cate and y_test_cate
+    for i in range(y_pred_cate.shape[0]):
         # inter
-        y_pred_categories[i] = y_pred_interaction[i]
-        y_test_categories[i] = y_test_interaction[i]    
+        y_pred_cate[i] = y_pred_inte[i]
+        y_test_cate[i] = y_test_inte[i]    
 
         # flavour
-        y_pred_categories[i] += (y_pred_flavour[i]*4)
-        y_test_categories[i] += (y_test_flavour[i]*4)
+        y_pred_cate[i] += (y_pred_flav[i]*4)
+        y_test_cate[i] += (y_test_flav[i]*4)
 
-        if y_pred_flavour[i] == 3:
-            y_pred_is_antineutrino[i] = 2
-            y_pred_interaction[i] = 4
-            y_pred_categories[i] = 12
+        if y_pred_flav[i] == 3:
+            y_pred_is_antinu[i] = 2
+            y_pred_inte[i] = 4
+            y_pred_cate[i] = 12
 
-        if y_test_flavour[i] == 3:
-            y_test_is_antineutrino[i] = 2
-            y_test_interaction[i] = 4
-            y_test_categories[i] = 12
+        if y_test_flav[i] == 3:
+            y_test_is_antinu[i] = 2
+            y_test_inte[i] = 4
+            y_test_cate[i] = 12
 
     with open(args.output_file, 'w') as fd:
-        # is_antineutrino
-        print('is_antineutrino report:\n', file=fd)
-        print(classification_report(y_test_is_antineutrino, y_pred_is_antineutrino, labels=list(range(len(is_antineutrino_target_names))),\
-              target_names=is_antineutrino_target_names), file=fd)
-        print('is_antineutrino confusion matrix (rows = predicted classes, cols = actual classes):\n', file=fd)
-        is_antineutrino_conf_matrix = confusion_matrix(y_pred_is_antineutrino, y_test_is_antineutrino, labels=list(range(len(is_antineutrino_target_names))))
-        print(is_antineutrino_conf_matrix, '\n', file=fd)
+        # is_antinu
+        print('is_antinu report:\n', file=fd)
+        print(classification_report(y_test_is_antinu, y_pred_is_antinu, labels=list(range(len(is_antinu_labels))),\
+              target_names=is_antinu_labels), file=fd)
+        print('is_antinu confusion matrix (rows = predicted classes, cols = actual classes):\n', file=fd)
+        is_antinu_conf_mat = confusion_matrix(y_pred_is_antinu, y_test_is_antinu, labels=list(range(len(is_antinu_labels))))
+        print(is_antinu_conf_mat, '\n', file=fd)
 
         # flavour 
         print('flavour report:\n', file=fd)
-        print(classification_report(y_test_flavour, y_pred_flavour, labels=list(range(len(flavour_target_names))),\
-              target_names=flavour_target_names), file=fd)
+        print(classification_report(y_test_flav, y_pred_flav, labels=list(range(len(flav_labels))),\
+              target_names=flav_labels), file=fd)
         print('flavour confusion matrix (rows = predicted classes, cols = actual classes):\n', file=fd)
-        flavour_conf_matrix = confusion_matrix(y_pred_flavour, y_test_flavour, labels=list(range(len(flavour_target_names))))
-        print(flavour_conf_matrix, '\n', file=fd)
+        flav_conf_mat = confusion_matrix(y_pred_flav, y_test_flav, labels=list(range(len(flav_labels))))
+        print(flav_conf_mat, '\n', file=fd)
 
         # interaction
         print('interaction report:\n', file=fd)
-        print(classification_report(y_test_interaction, y_pred_interaction, labels=list(range(len(interaction_target_names))),\
-              target_names=interaction_target_names), file=fd)
+        print(classification_report(y_test_inte, y_pred_inte, labels=list(range(len(inte_labels))),\
+              target_names=inte_labels), file=fd)
         print('interaction confusion matrix (rows = predicted classes, cols = actual classes):\n', file=fd)
-        interaction_conf_matrix = confusion_matrix(y_pred_interaction, y_test_interaction, labels=list(range(len(interaction_target_names))))
-        print(interaction_conf_matrix, '\n', file=fd)
+        inte_conf_mat = confusion_matrix(y_pred_inte, y_test_inte, labels=list(range(len(inte_labels))))
+        print(inte_conf_mat, '\n', file=fd)
 
         # categories
         print('categories report:\n', file=fd)
-        print(classification_report(y_test_categories, y_pred_categories, labels=list(range(len(categories_target_names))),\
-              target_names=categories_target_names), file=fd)
+        print(classification_report(y_test_cate, y_pred_cate, labels=list(range(len(cate_labels))),\
+              target_names=cate_labels), file=fd)
         print('categories confusion matrix (rows = predicted classes, cols = actual classes):\n', file=fd)
-        categories_conf_matrix = confusion_matrix(y_pred_categories, y_test_categories, labels=list(range(len(categories_target_names))))
-        print(categories_conf_matrix, '\n', file=fd)
+        cate_conf_mat = confusion_matrix(y_pred_cate, y_test_cate, labels=list(range(len(cate_labels))))
+        print(cate_conf_mat, '\n', file=fd)
 
         # protons
         print('protons report:\n', file=fd)
-        print(classification_report(y_test_protons, y_pred_protons, labels=list(range(len(protons_target_names))),\
-              target_names=protons_target_names), file=fd)
+        print(classification_report(y_test_prot, y_pred_prot, labels=list(range(len(prot_labels))),\
+              target_names=prot_labels), file=fd)
         print('protons confusion matrix (rows = predicted classes, cols = actual classes):\n', file=fd)
-        protons_conf_matrix = confusion_matrix(y_pred_protons, y_test_protons, labels=list(range(len(protons_target_names))))
-        print(protons_conf_matrix, '\n', file=fd)
+        prot_conf_mat = confusion_matrix(y_pred_prot, y_test_prot, labels=list(range(len(prot_labels))))
+        print(prot_conf_mat, '\n', file=fd)
 
-        # pions
+        # charged pions
         print('charged pions report:\n', file=fd)
-        print(classification_report(y_test_pions, y_pred_pions, labels=list(range(len(pions_target_names))),\
-              target_names=pions_target_names), file=fd)
+        print(classification_report(y_test_chpi, y_pred_chpi, labels=list(range(len(chpi_labels))),\
+              target_names=chpi_labels), file=fd)
         print('charged pions confusion matrix (rows = predicted classes, cols = actual classes):\n', file=fd)
-        pions_conf_matrix = confusion_matrix(y_pred_pions, y_test_pions, labels=list(range(len(pions_target_names))))
-        print(pions_conf_matrix, '\n', file=fd)
+        chpi_conf_mat = confusion_matrix(y_pred_chpi, y_test_chpi, labels=list(range(len(chpi_labels))))
+        print(chpi_conf_mat, '\n', file=fd)
 
-        # pizeros
+        # neutral pions
         print('neutral pions report:\n', file=fd)
-        print(classification_report(y_test_pizeros, y_pred_pizeros, labels=list(range(len(pizeros_target_names))),\
-              target_names=pizeros_target_names), file=fd)
+        print(classification_report(y_test_nepi, y_pred_nepi, labels=list(range(len(nepi_labels))),\
+              target_names=nepi_labels), file=fd)
         print('neutral pions confusion matrix (rows = predicted classes, cols = actual classes):\n', file=fd)
-        pizeros_conf_matrix = confusion_matrix(y_pred_pizeros, y_test_pizeros, labels=list(range(len(pizeros_target_names))))
-        print(pizeros_conf_matrix, '\n', file=fd)
+        nepi_conf_mat = confusion_matrix(y_pred_nepi, y_test_nepi, labels=list(range(len(nepi_labels))))
+        print(nepi_conf_mat, '\n', file=fd)
 
         # neutrons
         print('neutrons report:\n', file=fd)
-        print(classification_report(y_test_neutrons, y_pred_neutrons, labels=list(range(len(neutrons_target_names))),\
-              target_names=neutrons_target_names), file=fd)
+        print(classification_report(y_test_neut, y_pred_neut, labels=list(range(len(neut_labels))),\
+              target_names=neut_labels), file=fd)
         print('neutrons confusion matrix (rows = predicted classes, cols = actual classes):\n', file=fd)
-        neutrons_conf_matrix = confusion_matrix(y_pred_neutrons, y_test_neutrons, labels=list(range(len(neutrons_target_names))))
-        print(neutrons_conf_matrix, file=fd)
+        neut_conf_mat = confusion_matrix(y_pred_neut, y_test_neut, labels=list(range(len(neut_labels))))
+        print(neut_conf_mat, file=fd)
 
 if __name__ == '__main__':
     test()

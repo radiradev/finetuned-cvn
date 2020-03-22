@@ -9,14 +9,22 @@ import numpy as np
 import zlib
 
 class DataGenerator(object):
-    'Generates data for tf.keras'
+    ''' Generate data for tf.keras.
+    '''
 
-    '''
-    Initialization function of the class
-    '''
     def __init__(self, cells=500, planes=500, views=3, batch_size=32,
                  images_path = 'dataset', shuffle=True, test_values=[]):
-        'Initialization'
+        ''' Constructor.
+
+        Args:
+            cells: image cells.
+            planes: image planes.
+            views: number of views.
+            batch_size: batch size.
+            images_path: path of input events.
+            shuffle: shuffle the events.
+            test_values: array to be filled with test values.
+        '''
         self.cells = cells
         self.planes = planes
         self.views = views
@@ -25,12 +33,15 @@ class DataGenerator(object):
         self.shuffle = shuffle
         self.test_values = test_values
  
-    '''
-    Goes through the dataset and outputs one batch at a time.
-    ''' 
     def generate(self, labels, list_IDs):
-        'Generates batches of samples'
+        ''' Generates batches of samples.
+        
+        Args:
+            labels: event labels.
+            list_IDs: event IDs within partition.
 
+        Yields: a batch of events.
+        '''
         # Infinite loop
         while 1:
             # Generate random order of exploration of dataset (to make each epoch different)
@@ -48,15 +59,14 @@ class DataGenerator(object):
 
                  yield X
 
-    '''
-    Generates a random order of exploration for a given set of list_IDs. 
-    If activated, this feature will shuffle the order in which the examples 
-    are fed to the classifier so that batches between epochs do not look alike. 
-    Doing so will eventually make our model more robust.
-    '''
     def __get_exploration_order(self, list_IDs):
-        'Generates order of exploration'
+        ''' Generates order of exploration.
 
+        Args:
+            list_IDs: event IDs within partition.
+
+        Returns: random order of exploration.
+        '''
         # Find exploration order
         indexes = np.arange(len(list_IDs))
 
@@ -65,13 +75,15 @@ class DataGenerator(object):
 
         return indexes
 
-    '''
-    Outputs batches of data and only needs to know about the list of IDs included 
-    in batches as well as their corresponding labels.
-    '''
     def __data_generation(self, labels, list_IDs_temp):
-        'Generates data of batch_size samples'
+        ''' Generates data of batch_size sample.
 
+        Args:
+            labels: event labels.
+            list_IDs: event IDs within partition.
+
+        Returns: a batch of events.
+        '''
         X = [None]*self.views
 
         for view in range(self.views):
@@ -87,10 +99,10 @@ class DataGenerator(object):
             for view in range(self.views):
                 X[view][i, :, :, :] = pixels[view, :, :].reshape(self.planes, self.cells, 1)
 
-            # get y value
+            # get y label
             y_value = labels[ID]
 
-            # store actual label
+            # store actual y label
             self.test_values.append({'y_value':y_value})
 
         return X
