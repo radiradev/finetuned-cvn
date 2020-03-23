@@ -22,23 +22,23 @@ from tensorflow.keras import backend as K
 def DUNECVNModel(width=1,
                  weight_decay=1e-4,
                  weights=None):
-    return SEResNet(depth=[3, 4, 6, 3],
+    return SEResNetB(depth=[3, 4, 6, 3],
                     width=width,
                     weight_decay=weight_decay,
                     weights=weights)
 
-def SEResNet(initial_conv_filters=64,
-             depth=[3, 4, 6, 3],
-             filters=[64, 128, 256, 512],
-             width=1,
-             weight_decay=1e-4,
-             weights=None,
-             input_names=['view0','view1','view2'],
-             input_shapes=[[500,500,1],[500,500,1],[500,500,1]],
-             output_names=['is_antineutrino','flavour','interaction',\
-                           'protons','pions','pizeros','neutrons'],
-             output_neurons=[1,4,4,4,4,4,4]):
-    ''' Instantiate the Squeeze and Excite ResNet architecture.
+def SEResNetB(initial_conv_filters=64,
+              depth=[3, 4, 6, 3],
+              filters=[64, 128, 256, 512],
+              width=1,
+              weight_decay=1e-4,
+              weights=None,
+              input_names=['view0','view1','view2'],
+              input_shapes=[[500,500,1],[500,500,1],[500,500,1]],
+              output_names=['is_antineutrino','flavour','interaction',\
+                            'protons','pions','pizeros','neutrons'],
+              output_neurons=[1,4,4,4,4,4,4]):
+    ''' Instantiate the Squeeze and Excite ResNet architecture with branches.
     
     Args:
         initial_conv_filters: number of features for the initial convolution.
@@ -65,7 +65,7 @@ def SEResNet(initial_conv_filters=64,
     for i in range(len(inputs)):
         inputs[i] = Input(shape=input_shapes[i], name=input_names[i])
     # generate architecture
-    x = _create_se_resnet(inputs, initial_conv_filters,
+    x = _create_se_resnet_with_branches(inputs, initial_conv_filters,
                           filters, depth, width, weight_decay)
     # outputs
     outputs = [None]*len(output_names)
@@ -137,8 +137,8 @@ def squeeze_excite_block(input, ratio=16):
 
     return x
 
-def _create_se_resnet(img_input, initial_conv_filters, filters,
-                      depth, width,  weight_decay):
+def _create_se_resnet_with_branches(img_input, initial_conv_filters, filters,
+                                    depth, width,  weight_decay):
     '''Creates the SE-ResNet architecture with specified parameters.
 
     Args:
