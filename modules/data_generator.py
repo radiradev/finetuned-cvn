@@ -88,7 +88,8 @@ class DataGenerator(object):
         for i, ID in enumerate(list_IDs_temp):
             # Decompress images into pixel NumPy tensor
             with open('dataset/event' + ID + '.gz', 'rb') as image_file:
-                pixels = np.fromstring(zlib.decompress(image_file.read()), dtype=np.uint8, sep='').reshape(self.views, self.planes, self.cells)
+                pixels = np.fromstring(zlib.decompress(image_file.read()), dtype=np.uint8, sep='')
+                pixels = pixels.reshape(self.views, self.planes, self.cells)
             # Store volume
             for view in range(self.views):
                 X[view][i, :, :, :] = pixels[view, :, :].reshape(self.planes, self.cells, 1)
