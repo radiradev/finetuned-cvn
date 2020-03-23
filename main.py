@@ -55,10 +55,6 @@ def test():
     is_antinu_labels = ['nu', 'antinu']
     flav_labels = ['CC Numu', 'CC Nue', 'CC Nutau', 'NC']
     inte_labels = ['CC QE', 'CC Res', 'CC DIS', 'CC other']
-    cate_labels = ['CC QE Numu', 'CC Res Numu', 'CC DIS Numu', 'CC other Numu',\
-                   'CC QE Nue', 'CC Res Nue', 'CC DIS Nue', 'CC other Nue',\
-                   'CC QE Nutau', 'CC Res Nutau', 'CC DIS Nutau', 'CC other Nutau',\
-                   'NC']
     prot_labels = ['0 protons', '1 protons', '2 protons', '>2 protons']
     chpi_labels = ['0 ch. pions', '1 ch. pions', '2 ch. pions', '>2 ch. pions']
     nepi_labels = ['0 neu. pions', '1 neu. pions', '2 neu. pions', '>2 neu. pions']
@@ -74,7 +70,6 @@ def test():
     y_pred_is_antinu = np.around(Y_pred[0]).reshape((Y_pred[0].shape[0], 1)).astype(int)
     y_pred_flav = np.argmax(Y_pred[1], axis=1).reshape((Y_pred[1].shape[0], 1))
     y_pred_inte = np.argmax(Y_pred[2], axis=1).reshape((Y_pred[2].shape[0], 1))
-    y_pred_cate = np.zeros(y_pred_flav.shape, dtype=int)
     y_pred_prot = np.argmax(Y_pred[3], axis=1).reshape((Y_pred[3].shape[0], 1))
     y_pred_chpi = np.argmax(Y_pred[4], axis=1).reshape((Y_pred[4].shape[0], 1))
     y_pred_nepi = np.argmax(Y_pred[5], axis=1).reshape((Y_pred[5].shape[0], 1))
@@ -85,31 +80,19 @@ def test():
     y_test_is_antinu = np.array([aux[0] for aux in test_values]).reshape(y_pred_is_antinu.shape)
     y_test_flav = np.array([aux[1] for aux in test_values]).reshape(y_pred_flav.shape)
     y_test_inte = np.array([aux[2] for aux in test_values]).reshape(y_pred_inte.shape)
-    y_test_cate = np.zeros(y_test_flav.shape, dtype=int)
     y_test_prot = np.array([aux[3] for aux in test_values]).reshape(y_pred_prot.shape)
     y_test_chpi = np.array([aux[4] for aux in test_values]).reshape(y_pred_chpi.shape)
     y_test_nepi = np.array([aux[5] for aux in test_values]).reshape(y_pred_nepi.shape)
     y_test_neut = np.array([aux[6] for aux in test_values]).reshape(y_pred_neut.shape)
 
-    # manually calculate y_pred_cate and y_test_cate
-    for i in range(y_pred_cate.shape[0]):
-        # inter
-        y_pred_cate[i] = y_pred_inte[i]
-        y_test_cate[i] = y_test_inte[i]    
-
-        # flavour
-        y_pred_cate[i] += (y_pred_flav[i]*4)
-        y_test_cate[i] += (y_test_flav[i]*4)
-
-        # NC case
+    for i in range(y_pred_flav.shape[0]):
+        # NC exception
         if y_pred_flav[i] == 3:
             y_pred_is_antinu[i] = 2
             y_pred_inte[i] = 4
-            y_pred_cate[i] = 12
         if y_test_flav[i] == 3:
             y_test_is_antinu[i] = 2
             y_test_inte[i] = 4
-            y_test_cate[i] = 12
 
     with open(args.output_file, 'w') as fd:
         # is_antinu
@@ -135,14 +118,6 @@ def test():
         print('interaction confusion matrix (rows = predicted classes, cols = actual classes):\n', file=fd)
         inte_conf_mat = confusion_matrix(y_pred_inte, y_test_inte, labels=list(range(len(inte_labels))))
         print(inte_conf_mat, '\n', file=fd)
-
-        # categories
-        print('categories report:\n', file=fd)
-        print(classification_report(y_test_cate, y_pred_cate, labels=list(range(len(cate_labels))),\
-              target_names=cate_labels), file=fd)
-        print('categories confusion matrix (rows = predicted classes, cols = actual classes):\n', file=fd)
-        cate_conf_mat = confusion_matrix(y_pred_cate, y_test_cate, labels=list(range(len(cate_labels))))
-        print(cate_conf_mat, '\n', file=fd)
 
         # protons
         print('protons report:\n', file=fd)
