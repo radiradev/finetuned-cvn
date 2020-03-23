@@ -5,7 +5,7 @@ DUNE CVN [code](modules/dune_cvn.py).
 # Usage
 
 ```
-python main.py
+python test.py
 ```
 
 Optional arguments: 
