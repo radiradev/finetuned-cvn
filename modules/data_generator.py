@@ -42,16 +42,16 @@ class DataGenerator(object):
 
         Yields: a batch of events.
         '''
-        # Infinite loop
+        # infinite loop
         while 1:
-            # Generate random order of exploration of dataset (to make each epoch different)
+            # generate random order of exploration of dataset (to make each epoch different)
             indexes = self.get_exploration_order(list_IDs)
-            # Generate batches
+            # generate batches
             imax = int(len(indexes)/self.batch_size) # number of batches
             for i in range(imax):
-                 # Find list of IDs for one batch
+                 # find list of IDs for one batch
                  list_IDs_temp = [list_IDs[k] for k in indexes[i*self.batch_size:(i+1)*self.batch_size]]
-                 # Generate data
+                 # generate data
                  X = self.data_generation(labels, list_IDs_temp)
 
                  yield X
@@ -64,7 +64,7 @@ class DataGenerator(object):
 
         Returns: random order of exploration.
         '''
-        # Find exploration order
+        # find exploration order
         indexes = np.arange(len(list_IDs))
         if self.shuffle == True:
             np.random.shuffle(indexes)
@@ -84,13 +84,13 @@ class DataGenerator(object):
         for view in range(self.views):
             X[view] = np.empty((self.batch_size, self.planes, self.cells, 1), dtype='float32')
 
-        # Generate data
+        # generate data
         for i, ID in enumerate(list_IDs_temp):
-            # Decompress images into pixel NumPy tensor
+            # decompress images into pixel numpy array
             with open('dataset/event' + ID + '.gz', 'rb') as image_file:
                 pixels = np.fromstring(zlib.decompress(image_file.read()), dtype=np.uint8, sep='')
                 pixels = pixels.reshape(self.views, self.planes, self.cells)
-            # Store volume
+            # store volume
             for view in range(self.views):
                 X[view][i, :, :, :] = pixels[view, :, :].reshape(self.planes, self.cells, 1)
             # get y label
