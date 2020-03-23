@@ -45,21 +45,18 @@ class DataGenerator(object):
         # Infinite loop
         while 1:
             # Generate random order of exploration of dataset (to make each epoch different)
-            indexes = self.__get_exploration_order(list_IDs)
-
+            indexes = self.get_exploration_order(list_IDs)
             # Generate batches
             imax = int(len(indexes)/self.batch_size) # number of batches
-
             for i in range(imax):
                  # Find list of IDs for one batch
                  list_IDs_temp = [list_IDs[k] for k in indexes[i*self.batch_size:(i+1)*self.batch_size]]
-
                  # Generate data
-                 X = self.__data_generation(labels, list_IDs_temp)
+                 X = self.data_generation(labels, list_IDs_temp)
 
                  yield X
 
-    def __get_exploration_order(self, list_IDs):
+    def get_exploration_order(self, list_IDs):
         ''' Generates order of exploration.
 
         Args:
@@ -69,13 +66,12 @@ class DataGenerator(object):
         '''
         # Find exploration order
         indexes = np.arange(len(list_IDs))
-
         if self.shuffle == True:
             np.random.shuffle(indexes)
 
         return indexes
 
-    def __data_generation(self, labels, list_IDs_temp):
+    def data_generation(self, labels, list_IDs_temp):
         ''' Generates data of batch_size sample.
 
         Args:
@@ -85,7 +81,6 @@ class DataGenerator(object):
         Returns: a batch of events.
         '''
         X = [None]*self.views
-
         for view in range(self.views):
             X[view] = np.empty((self.batch_size, self.planes, self.cells, 1), dtype='float32')
 
@@ -94,15 +89,12 @@ class DataGenerator(object):
             # Decompress images into pixel NumPy tensor
             with open('dataset/event' + ID + '.gz', 'rb') as image_file:
                 pixels = np.fromstring(zlib.decompress(image_file.read()), dtype=np.uint8, sep='').reshape(self.views, self.planes, self.cells)
-
             # Store volume
             for view in range(self.views):
                 X[view][i, :, :, :] = pixels[view, :, :].reshape(self.planes, self.cells, 1)
-
             # get y label
             y_value = labels[ID]
-
             # store actual y label
-            self.test_values.append({'y_value':y_value})
+            self.test_values.append(y_value)
 
         return X

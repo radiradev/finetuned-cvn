@@ -56,32 +56,25 @@ def SEResNet(initial_conv_filters=64,
     '''
     assert len(depth) == len(filters), 'The length of filter increment list must match the length ' \
                                        'of the depth list.'
-
     assert len(input_names) == len(input_shapes), 'The length of input_names must match the length ' \
                                                   'of input_shapes.'
-
     assert len(output_names) == len(output_neurons), 'The length of output_names must match the length ' \
                                                      'of output_neurons.'
-
-    # Inputs
+    # inputs
     inputs = [None]*len(input_names)
     for i in range(len(inputs)):
         inputs[i] = Input(shape=input_shapes[i], name=input_names[i])
-
-    # Generate architecture
+    # generate architecture
     x = _create_se_resnet(inputs, initial_conv_filters,
                           filters, depth, width, weight_decay)
-
-    # Outputs
+    # outputs
     outputs = [None]*len(output_names)
     for i in range(len(outputs)):
         activation='sigmoid' if output_neurons[i]==1 else 'softmax'
         outputs[i] = Dense(output_neurons[i], use_bias=False, kernel_regularizer=l2(weight_decay),
                            activation=activation, name=output_names[i])(x)
- 
-    # Create model.
+    # create model
     model = Model(inputs=inputs, outputs=outputs, name='dunecvn')
-
     # load weights
     if weights:
         model.load_weights(weights, by_name=True)
@@ -104,24 +97,19 @@ def _resnet_block(input, filters, k=1, strides=(1, 1)):
 
     x = BatchNormalization(axis=channel_axis)(input)
     x = Activation('relu')(x)
-
-    #if strides != (1, 1) or init._keras_shape[channel_axis] != filters * k:
     if strides != (1, 1) or init.shape[channel_axis] != filters * k:
         init = Conv2D(filters * k, (1, 1), padding='same', kernel_initializer='he_normal',
                       use_bias=False, strides=strides)(x)
-
     x = Conv2D(filters * k, (3, 3), padding='same', kernel_initializer='he_normal',
                use_bias=False, strides=strides)(x)
     x = BatchNormalization(axis=channel_axis)(x)
     x = Activation('relu')(x)
-
     x = Conv2D(filters * k, (3, 3), padding='same', kernel_initializer='he_normal',
                use_bias=False)(x)
-
     # squeeze and excite block
     x = squeeze_excite_block(x)
-
     m = add([x, init])
+
     return m
 
 def squeeze_excite_block(input, ratio=16):
@@ -138,14 +126,13 @@ def squeeze_excite_block(input, ratio=16):
     filters = init.shape[channel_axis]
     se_shape = (1, 1, filters)
 
+    # se block
     se = GlobalAveragePooling2D()(init)
     se = Reshape(se_shape)(se)
     se = Dense(filters // ratio, activation='relu', kernel_initializer='he_normal', use_bias=False)(se)
     se = Dense(filters, activation='sigmoid', kernel_initializer='he_normal', use_bias=False)(se)
-
     if K.image_data_format() == 'channels_first':
         se = Permute((3, 1, 2))(se)
-
     x = multiply([init, se])
 
     return x
@@ -168,29 +155,24 @@ def _create_se_resnet(img_input, initial_conv_filters, filters,
 
     # branches
     branches = []
-
     for i in range(len(img_input)):
         # block 1 (initial conv block)
         branch = Conv2D(initial_conv_filters, (7, 7), padding='same', use_bias=False, strides=(2, 2),
                    kernel_initializer='he_normal', kernel_regularizer=l2(weight_decay))(img_input[i])
-
         branch = MaxPooling2D((3, 3), strides=(2, 2), padding='same')(branch)
-
         # block 2 (projection block)
         for i in range(N[0]):
             branch = _resnet_block(branch, filters[0], width)
-        
         branches.append(branch)
 
+    # concatenate branches
     x = concatenate(branches)
 
     # block 3 - N
     for k in range(1, len(N)):
         x = _resnet_block(x, filters[k], width)
-
         for i in range(N[k] - 1):
             x = _resnet_block(x, filters[k], width)
-
     x = BatchNormalization(axis=channel_axis)(x)
     x = Activation('relu')(x)
     x = GlobalAveragePooling2D()(x)
