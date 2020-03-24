@@ -20,7 +20,7 @@ To run the example, simply use:
 python test.py
 ```
 
-This will produce a file called results.txt in the ./output directory. This can be compared to [./output/expected_output.txt](output/expected_output.txt) to ensure the code has executed correctly.
+This will produce a file called results.txt in the ./output directory. This can be compared to [./output/expected_results.txt](output/expected_results.txt) to ensure the code has executed correctly.
 
 There are a number of arguments that can be used to change file paths, etc. The full list of these is given below:
 
