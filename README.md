@@ -2,6 +2,16 @@
 
 DUNE CVN [code](modules/dune_cvn.py).
 
+# Environment
+
+```
+python==3.6
+tensorflow==2.1.0
+numpy==1.17.3
+pickle=4.0
+sklearn=0.22.1
+```
+
 # Usage
 
 ```
