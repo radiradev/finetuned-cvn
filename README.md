@@ -1,6 +1,6 @@
 # The DUNE Convolutional Visual Network for neutrino interaction classification
 
-This software is provided as a minimal working example of the DUNE Convolutional Neural Network (CVN) as supplemental material to the article "Neutrino interaction classification with the DUNE Convolutional Visual Network" <insert reference when available>. See the LICENSE file for the copyright notice and usage options.
+This software is provided as a minimal working example of the DUNE Convolutional Neural Network (CVN) as supplemental material to the article "Neutrino interaction classification with the DUNE Convolutional Visual Network" <insert reference when available>. See the [LICENSE file](LICENSE) for the copyright notice and usage options.
 
 1. [Introduction to the CVN](#intro)
 2. [Usage instructions](#usage)
@@ -49,26 +49,26 @@ sklearn==0.22.1
 <a name="contents"></a>
 ## 3. Full contents of this release
 
-**./README.md**
+- **./README.md**
 	The README (this) file.
-**./test.py**
+- **./test.py**
 	Python script that runs the CVN over a sample of 20 events.
-**./dataset/event<n>.gz**
+- **./dataset/event<n>.gz**
 	Twenty (n = 0 to 19) input events from the DUNE simulation in Zlib-compressed array format.
-**./dataset.partition.p**
+- **./dataset.partition.p**
 	Pickle file containing the event ID numbers and a dictionary linking event number to truth information.
-**./modules/data_generator.py**
+- **./modules/data_generator.py**
 	Python class to load the input files provided in the dataset directory.
-**./modules/dune_cvn.py**
+- **./modules/dune_cvn.py**
 	Python classes describing the CVN network and its architecture.
-**./modules/opts.py**
+- **./modules/opts.py**
 	Code to parse user-configurable options.
-**./output/expected_results.txt**
+- **./output/expected_results.txt**
 	A text file containing the expected results of the inference.
-**./output/results.txt**
+- **./output/results.txt**
 	This file will be produced on running test.py, and should be identical to the expected_results.txt file.
-**./saved_model/model.json**
+- **./saved_model/model.json**
  	This is the architecture file describing the CVN.
-**./saved_model/weights.h5**
+- **./saved_model/weights.h5**
  	The internal weights of the CVN.
 
