@@ -22,7 +22,7 @@ To run the example, simply use:
 python test.py
 ```
 
-This will produce a file called results.txt in the ./output directory. This can be compared to [./output/expected_output.txt](output/expected_results.txt) to ensure the code has executed correctly.
+This will produce a file called results.txt in the ./output directory. This can be compared to [./output/expected_output.txt](output/expected_output.txt) to ensure the code has executed correctly.
 
 There are a number of arguments that can be used to change file paths, etc. The full list of these is given below:
 
@@ -50,25 +50,25 @@ sklearn==0.22.1
 ## 3. Full contents of this release
 
 - **./README.md**
-	The README (this) file.
+	- The README (this) file.
 - **./test.py**
-	Python script that runs the CVN over a sample of 20 events.
+	- Python script that runs the CVN over a sample of 20 events.
 - **./dataset/event<n>.gz**
-	Twenty (n = 0 to 19) input events from the DUNE simulation in Zlib-compressed array format.
+	- Twenty (n = 0 to 19) input events from the DUNE simulation in Zlib-compressed array format.
 - **./dataset.partition.p**
-	Pickle file containing the event ID numbers and a dictionary linking event number to truth information.
+	- Pickle file containing the event ID numbers and a dictionary linking event number to truth information.
 - **./modules/data_generator.py**
-	Python class to load the input files provided in the dataset directory.
+	- Python class to load the input files provided in the dataset directory.
 - **./modules/dune_cvn.py**
-	Python classes describing the CVN network and its architecture.
+	- Python classes describing the CVN network and its architecture.
 - **./modules/opts.py**
-	Code to parse user-configurable options.
+	- Code to parse user-configurable options.
 - **./output/expected_results.txt**
-	A text file containing the expected results of the inference.
+	- A text file containing the expected results of the inference.
 - **./output/results.txt**
-	This file will be produced on running test.py, and should be identical to the expected_results.txt file.
+	- This file will be produced on running test.py, and should be identical to the expected_results.txt file.
 - **./saved_model/model.json**
- 	This is the architecture file describing the CVN.
+ 	- This is the architecture file describing the CVN.
 - **./saved_model/weights.h5**
- 	The internal weights of the CVN.
+ 	- The internal weights of the CVN.
 
