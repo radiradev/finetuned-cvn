@@ -6,8 +6,6 @@ This software is provided as a minimal working example of the DUNE Convolutional
 2. [Usage instructions](#usage)
 3. [Full contents of this release](#contents)
 
-==========================================
-
 <a name="intro"></a>
 ## 1. Introduction to the CVN
 
@@ -53,7 +51,7 @@ sklearn==0.22.1
 	- The README (this) file.
 - **./test.py**
 	- Python script that runs the CVN over a sample of 20 events.
-- **./dataset/event<n>.gz**
+- **./dataset/event\<n\>.gz**
 	- Twenty (n = 0 to 19) input events from the DUNE simulation in Zlib-compressed array format.
 - **./dataset.partition.p**
 	- Pickle file containing the event ID numbers and a dictionary linking event number to truth information.
