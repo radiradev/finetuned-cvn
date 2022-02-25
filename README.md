@@ -1,6 +1,9 @@
+## Finetuned CVN
+This repo contains finetuned versions of the CVN on the collection and induction views, as well as, an implemntation of the Frechet Inception Score using the CVN. 
+
 # The DUNE Convolutional Visual Network for neutrino interaction classification
 
-This software is provided as a minimal working example of the DUNE Convolutional Neural Network (CVN) as supplemental material to the article "Neutrino interaction classification with the DUNE Convolutional Visual Network" <insert reference when available>. See the [LICENSE file](LICENSE) for the copyright notice and usage options.
+This software is provided as a minimal working example of the DUNE Convolutional Neural Network (CVN) as supplemental material to the article [*B. Abi et al. (DUNE Collaboration), "Neutrino interaction classification with a convolutional neural network in the DUNE far detector", Phys. Rev. D 102, 092003, 2020*](https://link.aps.org/doi/10.1103/PhysRevD.102.092003). See the [LICENSE file](LICENSE) for the copyright notice and usage options.
 
 1. [Introduction to the CVN](#intro)
 2. [Usage instructions](#usage)
@@ -26,14 +29,14 @@ There are a number of arguments that can be used to change file paths, etc. The 
 
 | Parameter                 | Default       | Description   |	
 | :------------------------ |:-------------:| :-------------|
-| --batch_size 	       |	10          |Batch size
+| --batch_size 	       |	10          |batch size
 | --model         |        'saved_model/model.json'          |JSON model
 | --weights         |        'saved_model/weights.h5'          |HDF5 pre-trained model weights
-| --dataset         |        'dataset'          |Dataset path
-| --partition         |        'dataset/partition.p'          |Pickled partition
-| --shuffle         |        False          |Shuffle partition
-| --print_model         |        False          |Print model summary
-| --output_file         |        'output/results.txt'          |Output fileput your list of options here>
+| --dataset         |        'dataset'          |dataset path
+| --partition         |        'dataset/partition.p'          |Pickle partition
+| --shuffle         |        False          |shuffle partition
+| --print_model         |        False          |print model summary
+| --output_file         |        'output/results.txt'          |output file
 
 Recommended software versions for use:
 
