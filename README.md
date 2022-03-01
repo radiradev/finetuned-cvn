@@ -1,5 +1,5 @@
 ## Finetuned CVN
-This repo contains finetuned versions of the CVN on the collection and induction views and an implemnetation of the Frechet Inception Score using the CVN. 
+This repo contains finetuned versions of the CVN on the collection and induction views and an implementation of the Frechet Inception Score using the CVN. 
 
 # The DUNE Convolutional Visual Network for neutrino interaction classification
 
