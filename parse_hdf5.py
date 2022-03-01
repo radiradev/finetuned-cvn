@@ -1,17 +1,23 @@
-import hdf5
 import h5py
 import yaml
 import glob
 import numpy as np
 
-from larndsim import consts
 from collections import defaultdict
 from scipy.sparse import save_npz, csc_matrix
 
 DATA_DIR = '/eos/user/r/rradev/nd2fd_data/larnd-sim/outputs/output_*.h5'
+TARGET_DIR = '/afs/cern.ch/user/r/rradev/cvn/dune-cvn/npz_files'
+consts = {
+    'vdrift': 0.1648, # cm / us
+    'cm2mm': 10,
+    't_sampling': 0.1, # us
+    'max_adc': 255,
+    'min_adc': 78
+}
 
-geometry_yaml = yaml.load(open("/geometry/multi_tile_layout-3.0.40.yaml"), Loader=yaml.FullLoader)
-det_yaml = yaml.load(open("/geometry/ndlar-module.yaml"),Loader=yaml.FullLoader)
+geometry_yaml = yaml.load(open("geometry/multi_tile_layout-3.0.40.yaml"), Loader=yaml.FullLoader)
+det_yaml = yaml.load(open("geometry/ndlar-module.yaml"),Loader=yaml.FullLoader)
 
 pixel_pitch = geometry_yaml['pixel_pitch']
 is_multi_tile = True
@@ -85,8 +91,8 @@ def get_x_y_t(packets):
         
         drift_direction = tile_orientations[tile][0]
         z_anode = tile_positions[tile][0] #z_anode is only measurement in mm instead of cm
-        vd = consts.vdrift*consts.cm2mm #mm /us 
-        clock_period = consts.t_sampling
+        vd = consts['vdrift']*consts['cm2mm']#mm /us 
+        clock_period = consts['t_sampling']
         z_positions = t*drift_direction*vd*clock_period  + z_offset + z_anode
         xyz_adc[idx, 2] = z_positions 
 
@@ -144,6 +150,8 @@ eos_files = glob.glob(DATA_DIR)
 
 correction = 0
 
+
+
 for file_path in eos_files:
     eos_file = h5py.File(file_path)
     eventIDs = np.unique(eos_file['tracks']['eventID'])
@@ -151,8 +159,17 @@ for file_path in eos_files:
         print(eventID)
         corrected_id = eventID - correction
         try: 
+            # Get event in pointcloud format
             event = get_simulated_event(event_id=corrected_id, file=eos_file)
-            save_npz(f'{corrected_id}.npz', csc_matrix(event).astype('uint8'), compressed=False)
+            x, y, z, adc = event.T
+
+            # Normalize adc counts
+            adc = (adc - consts['min_adc'])/(consts['max_adc'] - consts['min_adc'])
+            adc *= consts['max_adc']
+            
+            #Crop the event to 500, 500
+            numpy_event = get_numpy_event(x, y, z, adc, size=500, pixel_pitch = 5)
+            save_npz(f'{TARGET_DIR}/{corrected_id}.npz', csc_matrix(numpy_event).astype('uint8'), compressed=False)
         except:
             pass
     correction = np.max(eventIDs)
