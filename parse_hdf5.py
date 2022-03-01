@@ -10,9 +10,8 @@ from scipy.sparse import save_npz, csc_matrix
 
 DATA_DIR = '/eos/user/r/rradev/nd2fd_data/larnd-sim/outputs/output_*.h5'
 
-
-geometry_yaml = yaml.load(open("../larndsim/pixel_layouts/multi_tile_layout-3.0.40.yaml"), Loader=yaml.FullLoader)
-det_yaml = yaml.load(open("../larndsim/detector_properties/ndlar-module.yaml"),Loader=yaml.FullLoader)
+geometry_yaml = yaml.load(open("/geometry/multi_tile_layout-3.0.40.yaml"), Loader=yaml.FullLoader)
+det_yaml = yaml.load(open("/geometry/ndlar-module.yaml"),Loader=yaml.FullLoader)
 
 pixel_pitch = geometry_yaml['pixel_pitch']
 is_multi_tile = True
@@ -153,7 +152,7 @@ for file_path in eos_files:
         corrected_id = eventID - correction
         try: 
             event = get_simulated_event(event_id=corrected_id, file=eos_file)
-            save_npz(save_npz(f'{corrected_id}.npz', csc_matrix(event).astype('uint8'), compressed=False))
+            save_npz(f'{corrected_id}.npz', csc_matrix(event).astype('uint8'), compressed=False)
         except:
             pass
     correction = np.max(eventIDs)
